@@ -23,5 +23,8 @@
 
   "0a93e7fb": "Only cultured people would guess this one so easily — but you must be exhausted, and it’s getting colder and darker. Your suppliers have been paid, but your funding participants are now in debt. Run just like our job would and do the right thing this time — repay them! There’s a catch though: you don’t need to repay BT and Rabo in actual money. You need to repay them by having even more fun than during this quest — enjoying a well-deserved traditional dinner together with a glass of wine. Maybe borrow some more moonshine from Bogdi. Check your calendars and we’ll be waiting for you there.",
 
-  "6bc28e19": "This whole client journey is a small representation of all our efforts so far this year. Each clue, challenge, milestone, smaller and greater achievement, impediment, failure and success led us all here. You made it. Even if it might not feel like it in the moment, take a step back and think of everything you went through. Just like in real life, you made it work. So don’t forget this on a daily basis — we live in the real world, and we always make it work. Cheers!"
+  "6bc28e19": {
+    "text" : "This whole client journey is a small representation of all our efforts so far this year. Each clue, challenge, milestone, smaller and greater achievement, impediment, failure and success led us all here. You made it. Even if it might not feel like it in the moment, take a step back and think of everything you went through. Just like in real life, you made it work. So don’t forget this on a daily basis — we live in the real world, and we always make it work. Cheers!",
+    "youtube" : "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+  }
 }
