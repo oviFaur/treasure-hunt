@@ -1,9 +1,15 @@
 // netlify/functions/verify.js
 const crypto = require('crypto');
+const path = require('path');
+const fs = require('fs');
+
+const clues = JSON.parse(
+  fs.readFileSync(path.join(__dirname, '../../clues/clues.json'), 'utf8')
+);
 
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') {
-    return { statusCode:405, body: 'Method Not Allowed' };
+    return { statusCode: 405, body: 'Method Not Allowed' };
   }
 
   let body = {};
@@ -11,28 +17,18 @@ exports.handler = async (event) => {
   const { clue, password } = body || {};
 
   if (!clue || !password) {
-    return { statusCode:200, body: JSON.stringify({ ok:false, err:'missing' }) };
+    return { statusCode: 200, body: JSON.stringify({ ok:false, err:'missing' }) };
   }
 
-  // 1) hash incoming password
+  // hash parola primită
   const incomingHash = crypto.createHash('sha256').update(String(password)).digest('hex');
+  const expectedHash = process.env['CLUE_COMMON'];
 
-  // 2) expected global hash (env var CLUE_COMMON) OR per-clue fallback
-  const common = process.env['CLUE_COMMON'];
-  const perClue = process.env[`CLUE_${String(clue).toUpperCase()}_HASH`]; // optional override
-  const expectedHash = perClue || common;
-
-  if (!expectedHash) {
-    return { statusCode:200, body: JSON.stringify({ ok:false, err:'nohash' }) };
+  if (!expectedHash || incomingHash !== expectedHash) {
+    return { statusCode: 200, body: JSON.stringify({ ok:false, err:'wrong' }) };
   }
 
-  if (incomingHash !== expectedHash) {
-    return { statusCode:200, body: JSON.stringify({ ok:false, err:'wrong' }) };
-  }
+  const nextText = clues[clue.toLowerCase()] || 'No clue text found.';
 
-  // password OK -> return next text (env var CLUE_<CLUE>_NEXT) or generic
-  const nextText = process.env[`CLUE_${String(clue).toUpperCase()}_NEXT`] || '✔️ Corect! Mergi mai departe.';
-  const nextUrl  = process.env[`CLUE_${String(clue).toUpperCase()}_NEXT_URL`] || null;
-
-  return { statusCode:200, body: JSON.stringify({ ok:true, nextText, nextUrl }) };
+  return { statusCode: 200, body: JSON.stringify({ ok:true, nextText }) };
 };
