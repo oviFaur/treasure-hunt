@@ -1,15 +1,35 @@
 <!doctype html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Treasure Hunt — Clue</title>
   <style>
-    body{font-family:Arial,system-ui;margin:20px;max-width:800px}
-    img{max-width:100%;height:auto;border-radius:8px;box-shadow:0 2px 6px rgba(0,0,0,0.12)}
-    .controls{margin-top:14px}
-    input,button{width:100%;padding:10px;font-size:16px;margin-top:8px;box-sizing:border-box}
-    .ok{color:green}.err{color:#b00}
+    body {
+      font-family: Arial, system-ui;
+      margin: 20px;
+      max-width: 800px;
+      line-height: 1.5;
+    }
+    img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+      margin-bottom: 16px;
+    }
+    .controls {
+      margin-top: 14px;
+    }
+    input, button {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      margin-top: 8px;
+      box-sizing: border-box;
+    }
+    .ok { color: green; margin-top: 12px; }
+    .err { color: #b00; margin-top: 12px; }
   </style>
 </head>
 <body>
@@ -20,26 +40,25 @@
   </div>
 
   <div class="controls">
-    <label>Parola (aceeași pentru toate clue-urile)</label>
-    <input id="pwd" type="password" placeholder="Introdu parola..." />
-    <button id="check">Verifică</button>
+    <label for="pwd">Enter the password</label>
+    <input id="pwd" type="password" placeholder="Password..." />
+    <button id="check">Verify</button>
     <p id="out"></p>
   </div>
 
   <script>
     const q = new URLSearchParams(location.search);
-    const clue = (q.get('clue') || 'clue1').toLowerCase();
+    const clue = (q.get('clue') || '').toLowerCase();
 
-    // imagine publică în repo: /clues/images/clue1.jpg etc.
-    const imgEl = document.getElementById('clueImg');
-    imgEl.src = `/clues/images/${clue}.jpg`;
-    // optional: setăm caption
-    // document.getElementById('caption').textContent = clue;
+    // load clue image if exists
+    if (clue) {
+      document.getElementById('clueImg').src = `/clues/images/${clue}.jpg`;
+    }
 
     document.getElementById('check').addEventListener('click', async () => {
-      const pwd = document.getElementById('pwd').value || '';
+      const pwd = document.getElementById('pwd').value.trim();
       const out = document.getElementById('out');
-      out.textContent = 'Verific...';
+      out.textContent = 'Checking...';
 
       try {
         const res = await fetch('/.netlify/functions/verify', {
@@ -49,13 +68,12 @@
         });
         const j = await res.json();
         if (j.ok) {
-          out.innerHTML = `<span class="ok"><strong>Corect!</strong><br>${j.nextText || 'Următorul indiciu.'}</span>`;
-          if (j.nextUrl) out.innerHTML += `<div style="margin-top:8px"><a href="${j.nextUrl}">Mergi mai departe</a></div>`;
+          out.innerHTML = `<div class="ok"><strong>Correct!</strong><br>${j.nextText}</div>`;
         } else {
-          out.innerHTML = `<span class="err">Parolă greșită.</span>`;
+          out.innerHTML = `<div class="err">Wrong password.</div>`;
         }
       } catch (e) {
-        out.innerHTML = `<span class="err">Eroare rețea. Încearcă din nou.</span>`;
+        out.innerHTML = `<div class="err">Network error. Try again.</div>`;
       }
     });
   </script>
