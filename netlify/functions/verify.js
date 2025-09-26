@@ -19,7 +19,6 @@ exports.handler = async (event) => {
     return { statusCode: 200, body: JSON.stringify({ ok:false, err:'missing' }) };
   }
 
-  // calculează hash parola primită
   const incomingHash = crypto.createHash('sha256').update(String(password)).digest('hex');
   const expectedHash = process.env['CLUE_COMMON'];
 
@@ -27,12 +26,25 @@ exports.handler = async (event) => {
     return { statusCode: 200, body: JSON.stringify({ ok:false, err:'wrong' }) };
   }
 
-  // returnează textul indiciului
   const clueKey = clue.toLowerCase();
-  const nextText = clues[clueKey] || 'No clue text found.';
+  const clueData = clues[clueKey];
 
+  if (!clueData) {
+    return { statusCode: 200, body: JSON.stringify({ ok:true, nextText: 'No clue text found.' }) };
+  }
+
+  // dacă e doar text simplu
+  if (typeof clueData === 'string') {
+    return { statusCode: 200, body: JSON.stringify({ ok:true, nextText: clueData }) };
+  }
+
+  // dacă e obiect cu text + youtube
   return {
     statusCode: 200,
-    body: JSON.stringify({ ok:true, nextText })
+    body: JSON.stringify({
+      ok: true,
+      nextText: clueData.text,
+      youtube: clueData.youtube || null
+    })
   };
 };
